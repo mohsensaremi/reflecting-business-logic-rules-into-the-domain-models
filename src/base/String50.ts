@@ -1,16 +1,13 @@
-import {CustomTypeError} from "../exception/CustomTypeError";
+import * as t from 'io-ts';
 
 export type String50 = {
     kind: "String50",
     value: string,
 }
 
-export const makeString50 = (arg: any): String50 => {
-    if (typeof arg === "string" && arg.length <= 50) {
-        return {
-            kind: "String50",
-            value: arg,
-        };
-    }
-    throw new CustomTypeError("String50", arg);
-}
+export const String50Codec = new t.Type<String50, string>(
+    'String50',
+    (u): u is String50 => u && (u as any).kind === "String50" && typeof (u as any).value === "string",
+    (u, c) => typeof u === "string" && u.length <= 50 ? t.success({kind: "String50", value: u}) : t.failure(u, c),
+    (c) => c.value,
+);

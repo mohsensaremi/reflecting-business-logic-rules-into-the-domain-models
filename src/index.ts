@@ -1,5 +1,6 @@
-import {makePerson} from "./models/Person";
-import {CustomTypeError} from "./exception/CustomTypeError";
+import {PersonCodec} from "./models/Person";
+import {isRight} from "fp-ts/lib/Either";
+import {PathReporter} from "io-ts/lib/PathReporter";
 
 const main = () => {
     createAndLogPerson("person1", {
@@ -36,15 +37,16 @@ const main = () => {
 }
 
 const createAndLogPerson = (label: string, data: any) => {
-    try {
-        const person = makePerson(data);
-        console.log(label, person);
-    } catch (e) {
-        if (e instanceof CustomTypeError) {
-            console.error(`ERROR ${label}: ${e.message}`);
-        } else {
-            throw e;
-        }
+    const personEither = PersonCodec.decode(data);
+    if (isRight(personEither)) {
+        const person = personEither.right;
+        console.log(`${label}`, person);
+        console.log(`${label} encoded`, PersonCodec.encode(person));
+        console.log("\n\n");
+    } else {
+        const report = PathReporter.report(personEither);
+        console.error(`ERROR ${label}: ${report}`);
+        console.log("\n\n");
     }
 }
 

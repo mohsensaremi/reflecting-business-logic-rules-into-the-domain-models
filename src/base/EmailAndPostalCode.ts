@@ -1,18 +1,10 @@
-import {Email, makeEmail} from "./Email";
-import {makePostalCode, PostalCode} from "./PostalCode";
-import {CustomTypeError} from "../exception/CustomTypeError";
+import * as t from 'io-ts';
+import {EmailCodec} from "./Email";
+import {PostalCodeCodec} from "./PostalCode";
 
-export type EmailAndPostalCode = {
-    email: Email
-    postalCode: PostalCode,
-}
+export const EmailAndPostalCodeCodec = t.type({
+    email: EmailCodec,
+    postalCode: PostalCodeCodec,
+}, 'EmailAndPostalCode');
 
-export const makeEmailAndPostalCode = (arg: any): EmailAndPostalCode => {
-    if (arg) {
-        return {
-            email: makeEmail(arg.email),
-            postalCode: makePostalCode(arg.postalCode),
-        };
-    }
-    throw new CustomTypeError("EmailAndPostalCode", arg);
-}
+export type EmailAndPostalCode = t.TypeOf<typeof EmailAndPostalCodeCodec>
